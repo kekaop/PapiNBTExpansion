@@ -1,17 +1,17 @@
-# PapiNBTExpansion
+## PapiNBTExpansion
 
-Плагин для **Paper**, который регистрирует расширение **PlaceholderAPI** для чтения NBT-тегов из предметов игрока через [Item-NBT-API](https://github.com/tr7zw/Item-NBT-API) (плагин **NBTAPI** на сервере).
+Небольшое **расширение для PlaceholderAPI**, которое читает NBT‑теги из предметов игрока через [Item-NBT-API](https://github.com/tr7zw/Item-NBT-API) (плагин **NBTAPI** на сервере).
 
-## Требования
+### Требования
 
 | Компонент | Версия |
 |-----------|--------|
 | Java | **21** |
 | Paper | **1.21.4** |
-| PlaceholderAPI | **2.11.x** (обязателен, `depend`) |
-| NBTAPI | Item-NBT-API на сервере (обязателен для работы плейсхолдеров) |
+| PlaceholderAPI | **2.11.x** (обязателен) |
+| NBTAPI | Item-NBT-API (плагин `NBTAPI` установлен на сервере) |
 
-## Плейсхолдер
+### Формат плейсхолдера
 
 ```text
 %nbt_<слот>_<тег>%
@@ -19,7 +19,7 @@
 
 После идентификатора `nbt_` указываются слот и путь к тегу (через `_` между слотом и началом пути; вложенность внутри тега — точками, как в Item-NBT-API).
 
-### Слоты
+#### Слоты
 
 | Значение | Описание |
 |----------|----------|
@@ -28,12 +28,12 @@
 | `helmet`, `chestplate`, `leggings`, `boots` | Броня |
 | `slot:0` … `slot:35` | Слоты инвентаря (`PlayerInventory#getItem`) |
 
-### Поведение
+#### Поведение
 
 - Поддерживаемые типы NBT: **BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, STRING** — выводятся строкой.
 - Нет тега, пустой слот, неверный слот или формат — пустая строка `""`.
 
-### Примеры
+#### Примеры
 
 ```text
 %nbt_mainhand_PICKAXE_POWER%
@@ -43,15 +43,23 @@
 %nbt_mainhand_stats.level%
 ```
 
-## Установка
+### Установка как внешнего расширения PlaceholderAPI
 
-1. Установите на сервер **PlaceholderAPI** и **NBTAPI** (Item-NBT-API).
-2. Положите собранный JAR в папку `plugins/`.
-3. Перезапустите сервер или выполните `/papi reload` после полной загрузки.
+1. Установите на сервер плагины **PlaceholderAPI** и **NBTAPI** (Item-NBT-API).
+2. Соберите JAR (`mvn clean package` с JDK 21).
+3. Поместите `papi-nbt-expansion-<version>.jar` **не** в `plugins/`, а в:
+   - `plugins/PlaceholderAPI/expansions/`
+4. Выполните `/papi reload` или перезапустите сервер.
 
-Проверка: `/papi parse me %nbt_mainhand_<ваш_тег>%` или `/papi list` (должен быть идентификатор `nbt`).
+Проверить работу можно, например, так:
 
-## Сборка
+```text
+/papi parse me %nbt_mainhand_<ваш_тег>%
+```
+
+Идентификатор расширения: `nbt`.
+
+### Сборка
 
 Нужен **JDK 21** (Maven должен использовать его, например `JAVA_HOME` на JDK 21):
 
@@ -60,7 +68,3 @@ mvn clean package
 ```
 
 Готовый файл: `target/papi-nbt-expansion-<version>.jar`.
-
-## Лицензия
-
-Укажите лицензию по желанию автору проекта.

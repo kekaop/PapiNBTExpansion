@@ -1,8 +1,0 @@
-name: PapiNBTExpansion
-version: '${project.version}'
-main: dev.orven.papinbt.PapiNbtPlugin
-api-version: '1.21'
-authors: [Orven]
-description: PlaceholderAPI expansion for item NBT tags (requires NBTAPI).
-depend: [PlaceholderAPI]
-softdepend: [NBTAPI]

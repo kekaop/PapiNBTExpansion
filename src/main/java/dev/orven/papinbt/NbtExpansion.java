@@ -1,9 +1,9 @@
 package dev.orven.papinbt;
 
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -22,12 +22,6 @@ public final class NbtExpansion extends PlaceholderExpansion {
             Pattern.compile("^(mainhand|offhand|helmet|chestplate|leggings|boots)_(.+)$");
     private static final Pattern INDEX_SLOT = Pattern.compile("^slot:(\\d+)_(.+)$");
 
-    private final PapiNbtPlugin plugin;
-
-    public NbtExpansion(PapiNbtPlugin plugin) {
-        this.plugin = plugin;
-    }
-
     @Override
     public @NotNull String getIdentifier() {
         return "nbt";
@@ -40,12 +34,18 @@ public final class NbtExpansion extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getVersion() {
-        return plugin.getPluginMeta().getVersion();
+        return "1.0.0";
     }
 
     @Override
-    public boolean persist() {
-        return true;
+    public @NotNull String getRequiredPlugin() {
+        // External expansion depends on NBTAPI plugin being present
+        return "NBTAPI";
+    }
+
+    @Override
+    public boolean canRegister() {
+        return Bukkit.getPluginManager().getPlugin(getRequiredPlugin()) != null;
     }
 
     @Override
@@ -87,7 +87,7 @@ public final class NbtExpansion extends PlaceholderExpansion {
             return "";
         }
 
-        return NBT.get(stack, (Function<ReadableItemNBT, String>) nbt -> readSupportedTagAsString(nbt, tagPath));
+        return NBT.get(stack, (ReadableItemNBT nbt) -> readSupportedTagAsString(nbt, tagPath));
     }
 
     private static @Nullable ItemStack resolveItem(PlayerInventory inv, String slotKey) {
