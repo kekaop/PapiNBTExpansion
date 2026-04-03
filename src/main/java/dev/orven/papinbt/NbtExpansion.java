@@ -4,6 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -38,20 +39,19 @@ public final class NbtExpansion extends PlaceholderExpansion {
     }
 
     @Override
-    public @NotNull String getRequiredPlugin() {
-        // External expansion depends on NBTAPI plugin being present
-        return "NBTAPI";
-    }
-
-    @Override
     public boolean canRegister() {
-        return Bukkit.getPluginManager().getPlugin(getRequiredPlugin()) != null;
+        return true;
     }
 
     @Override
-    public @Nullable String onPlaceholderRequest(Player player, @NotNull String params) {
-        if (player == null || params.isEmpty()) {
-            return "";
+    public @Nullable String onRequest(OfflinePlayer offlinePlayer, @NotNull String params) {
+        if (offlinePlayer == null || params.isEmpty()) {
+            return null;
+        }
+
+        Player player = offlinePlayer.getPlayer();
+        if (player == null) {
+            return null;
         }
 
         String slotKey;
@@ -62,24 +62,24 @@ public final class NbtExpansion extends PlaceholderExpansion {
             try {
                 index = Integer.parseInt(m.group(1));
             } catch (NumberFormatException ignored) {
-                return "";
+                return null;
             }
             if (index < 0 || index > 35) {
-                return "";
+                return null;
             }
             slotKey = "slot:" + index;
             tagPath = m.group(2);
         } else {
             m = NAMED_SLOT.matcher(params);
             if (!m.matches()) {
-                return "";
+                return null;
             }
             slotKey = m.group(1);
             tagPath = m.group(2);
         }
 
         if (tagPath.isEmpty()) {
-            return "";
+            return null;
         }
 
         ItemStack stack = resolveItem(player.getInventory(), slotKey);
@@ -92,12 +92,12 @@ public final class NbtExpansion extends PlaceholderExpansion {
 
     private static @Nullable ItemStack resolveItem(PlayerInventory inv, String slotKey) {
         return switch (slotKey) {
-            case "mainhand" -> inv.getItemInMainHand();
-            case "offhand" -> inv.getItemInOffHand();
-            case "helmet" -> inv.getHelmet();
+            case "mainhand"   -> inv.getItemInMainHand();
+            case "offhand"    -> inv.getItemInOffHand();
+            case "helmet"     -> inv.getHelmet();
             case "chestplate" -> inv.getChestplate();
-            case "leggings" -> inv.getLeggings();
-            case "boots" -> inv.getBoots();
+            case "leggings"   -> inv.getLeggings();
+            case "boots"      -> inv.getBoots();
             default -> {
                 if (slotKey.startsWith("slot:")) {
                     int i = Integer.parseInt(slotKey.substring("slot:".length()));
@@ -134,20 +134,17 @@ public final class NbtExpansion extends PlaceholderExpansion {
         }
 
         return switch (type) {
-            case NBTTagByte -> String.valueOf(parent.getByte(leafKey));
-            case NBTTagShort -> String.valueOf(parent.getShort(leafKey));
-            case NBTTagInt -> String.valueOf(parent.getInteger(leafKey));
-            case NBTTagLong -> String.valueOf(parent.getLong(leafKey));
-            case NBTTagFloat -> String.valueOf(parent.getFloat(leafKey));
+            case NBTTagByte   -> String.valueOf(parent.getByte(leafKey));
+            case NBTTagShort  -> String.valueOf(parent.getShort(leafKey));
+            case NBTTagInt    -> String.valueOf(parent.getInteger(leafKey));
+            case NBTTagLong   -> String.valueOf(parent.getLong(leafKey));
+            case NBTTagFloat  -> String.valueOf(parent.getFloat(leafKey));
             case NBTTagDouble -> String.valueOf(parent.getDouble(leafKey));
             case NBTTagString -> parent.getString(leafKey);
             default -> "";
         };
     }
 
-    /**
-     * Last '.' that separates compound path from leaf key, ignoring dots escaped as '\.' per Item-NBT-API.
-     */
     private static int indexOfLastPathSeparator(String path) {
         for (int i = path.length() - 1; i >= 0; i--) {
             if (path.charAt(i) == '.') {
