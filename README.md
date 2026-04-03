@@ -1,40 +1,38 @@
 ## PapiNBTExpansion
 
-Небольшое **расширение для PlaceholderAPI**, которое читает NBT‑теги из предметов игрока через [Item-NBT-API](https://github.com/tr7zw/Item-NBT-API) (плагин **NBTAPI** на сервере).
+A small **PlaceholderAPI expansion** that reads NBT tags from player items using [Item-NBT-API](https://github.com/tr7zw/Item-NBT-API) (the **NBTAPI** plugin on the server).
 
-### Требования
+### Requirements
 
-| Компонент | Версия |
-|-----------|--------|
+| Component | Version |
+|-----------|---------|
 | Java | **21** |
 | Paper | **1.21.4** |
-| PlaceholderAPI | **2.11.x** (обязателен) |
-| NBTAPI | Item-NBT-API (плагин `NBTAPI` установлен на сервере) |
+| PlaceholderAPI | **2.11.x** (required) |
+| NBTAPI | Item-NBT-API (the `NBTAPI` plugin must be installed on the server) |
 
-### Формат плейсхолдера
-
+### Placeholder Format
 ```text
-%nbt_<слот>_<тег>%
+%nbt_<slot>_<tag>%
 ```
 
-После идентификатора `nbt_` указываются слот и путь к тегу (через `_` между слотом и началом пути; вложенность внутри тега — точками, как в Item-NBT-API).
+After the `nbt_` identifier, specify the slot and the tag path (separated by `_` between the slot and the start of the path; nesting within the tag uses dots, as in Item-NBT-API).
 
-#### Слоты
+#### Slots
 
-| Значение | Описание |
-|----------|----------|
-| `mainhand` | Основная рука |
-| `offhand` | Вторая рука |
-| `helmet`, `chestplate`, `leggings`, `boots` | Броня |
-| `slot:0` … `slot:35` | Слоты инвентаря (`PlayerInventory#getItem`) |
+| Value | Description |
+|-------|-------------|
+| `mainhand` | Main hand |
+| `offhand` | Off hand |
+| `helmet`, `chestplate`, `leggings`, `boots` | Armor slots |
+| `slot:0` ... `slot:35` | Inventory slots (`PlayerInventory#getItem`) |
 
-#### Поведение
+#### Behavior
 
-- Поддерживаемые типы NBT: **BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, STRING** — выводятся строкой.
-- Нет тега, пустой слот, неверный слот или формат — пустая строка `""`.
+- Supported NBT types: **BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, STRING** — returned as a string.
+- Missing tag, empty slot, invalid slot or invalid format — returns an empty string `""`.
 
-#### Примеры
-
+#### Examples
 ```text
 %nbt_mainhand_PICKAXE_POWER%
 %nbt_helmet_ARMOR_TIER%
@@ -43,28 +41,26 @@
 %nbt_mainhand_stats.level%
 ```
 
-### Установка как внешнего расширения PlaceholderAPI
+### Installation as an External PlaceholderAPI Expansion
 
-1. Установите на сервер плагины **PlaceholderAPI** и **NBTAPI** (Item-NBT-API).
-2. Соберите JAR (`mvn clean package` с JDK 21).
-3. Поместите `papi-nbt-expansion-<version>.jar` **не** в `plugins/`, а в:
+1. Install **PlaceholderAPI** and **NBTAPI** (Item-NBT-API) on your server.
+2. Build the JAR (`mvn clean package` with JDK 21).
+3. Place `papi-nbt-expansion-<version>.jar` **not** in `plugins/`, but in:
    - `plugins/PlaceholderAPI/expansions/`
-4. Выполните `/papi reload` или перезапустите сервер.
+4. Run `/papi reload` or restart the server.
 
-Проверить работу можно, например, так:
-
+You can verify it works like this:
 ```text
-/papi parse me %nbt_mainhand_<ваш_тег>%
+/papi parse me %nbt_mainhand_<your_tag>%
 ```
 
-Идентификатор расширения: `nbt`.
+Expansion identifier: `nbt`.
 
-### Сборка
+### Building
 
-Нужен **JDK 21** (Maven должен использовать его, например `JAVA_HOME` на JDK 21):
-
+**JDK 21** is required (Maven must use it, e.g. set `JAVA_HOME` to JDK 21):
 ```bash
 mvn clean package
 ```
 
-Готовый файл: `target/papi-nbt-expansion-<version>.jar`.
+Output file: `target/papi-nbt-expansion-<version>.jar`.
